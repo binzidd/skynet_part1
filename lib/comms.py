@@ -1,9 +1,10 @@
 import struct
 
-from Crypto.Cipher import XOR, AES
+from Crypto.Cipher import AES
 from Crypto import Random
 
-from dh import dh_key_creation, calculate_dh_secret, initialisingvector
+from dh import dh_key_creation, calculate_dh_secret
+
 
 class StealthConn(object):
     def __init__(self, conn, client=False, server=False, verbose=False):
@@ -28,21 +29,9 @@ class StealthConn(object):
             # Obtain our shared secret
             shared_hash = calculate_dh_secret(their_public_key, my_private_key)
             print("Shared hash: {}".format(shared_hash))
-
-        #  to continue from here
-        def performing_aes():
             key= shared_hash
-            initialisingvector = IV  #NOT SURE HOW TO INVOKE
-            aes_encryption= AES.new(key,AES.MODE_CBC,initialisingvector)
-
-
-        #  passphrase MUST be 16, 24 or 32 bytes long, how can I do that ?
-       # IV = Random.new().read(BLOCK_SIZE)
-        #aes = AES.new(passphrase, AES.MODE_CFB, IV)
-        #return base64.b64encode(aes.encrypt(message))
-
-        # Implementing AES
-        self.cipher = AES.new(shared_hash[:8]) # this is 2^8 = 256 bits
+            IV = SHA256.new(bytes(shared_hash, "ascii")).hexdigest()
+            self.cipher = AES.new(key,AES.MODE_CBC,initialisingvector)
 
     def send(self, data):
         if self.cipher:
