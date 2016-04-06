@@ -31,7 +31,7 @@ class StealthConn(object):
             print("Shared hash: {}".format(shared_hash))
             key= shared_hash
             IV = SHA256.new(bytes(shared_hash, "ascii")).hexdigest()
-            self.cipher = AES.new(key,AES.MODE_CBC,initialisingvector)
+            self.cipher = AES.new(key,AES.MODE_CBC,IV) # 32 byte key length AES-256
 
     def send(self, data):
         if self.cipher:
@@ -43,7 +43,7 @@ class StealthConn(object):
         else:
             encrypted_data = data
 
-        # Encode the data's length into an unsigned two byte int ('H')
+        # Encode the data's length into an unsigned two byte int ('H') http://www.di-mgt.com.au/cryptoCipherText.html
         pkt_len = struct.pack('H', len(encrypted_data))
         self.conn.sendall(pkt_len)
         self.conn.sendall(encrypted_data)
