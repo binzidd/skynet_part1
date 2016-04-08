@@ -82,7 +82,8 @@ def calculate_dh_secret(their_public, my_private):
     shared_hash = SHA256.new(bytes(shared_secret, "ascii")).hexdigest()
     return shared_hash
 
+def aes_iv():
+    iv=random.randint (0, int(2 ** 128))
+    hash_iv= SHA256.new(bytes(iv,"ascii")).hexdigest()
+    return hash_iv
 
-#def initialisingvector(shared_hash):
- #   IV = SHA256.new(bytes(shared_hash, "ascii")).hexdigest()
-  #  return IV

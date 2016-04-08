@@ -4,6 +4,8 @@ from Crypto.Cipher import AES
 from Crypto import Random
 
 from dh import dh_key_creation, calculate_dh_secret
+from dh import prime
+from dh import aes_iv
 
 
 class StealthConn(object):
@@ -14,6 +16,7 @@ class StealthConn(object):
         self.server = server
         self.verbose = verbose
         self.initiate_session()
+        self.check_public_key()
 
     def initiate_session(self):
         # Perform the initial connection handshake for agreeing on a shared secret
@@ -30,8 +33,19 @@ class StealthConn(object):
             shared_hash = calculate_dh_secret(their_public_key, my_private_key)
             print("Shared hash: {}".format(shared_hash))
             key= shared_hash
-            IV = SHA256.new(bytes(shared_hash, "ascii")).hexdigest()
-            self.cipher = AES.new(key,AES.MODE_CBC,IV) # 32 byte key length AES-256
+            iv=aes_iv()
+            #IV = SHA256.new(bytes(shared_hash, "ascii")).hexdigest()
+            self.cipher = AES.new(key,AES.MODE_CBC,iv)
+            # 32 byte key length AES-256
+
+    def verify_publickey(self):
+        check_their_public_key=int(self.recv())
+        if check_their_public_key in [2,prime-1]:
+            return
+        else :
+            print("Key out of range")
+            self.
+
 
     def send(self, data):
         if self.cipher:
